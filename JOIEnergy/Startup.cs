@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace JOIEnergy
 {
@@ -46,6 +49,7 @@ namespace JOIEnergy
                 }
             };
 
+            services.AddCors();
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IMeterReadingService, MeterReadingService>();
@@ -53,6 +57,7 @@ namespace JOIEnergy
             services.AddSingleton((IServiceProvider arg) => readings);
             services.AddSingleton((IServiceProvider arg) => pricePlans);
             services.AddSingleton((IServiceProvider arg) => SmartMeterToPricePlanAccounts);
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +69,20 @@ namespace JOIEnergy
             }
 
             app.UseMvc();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "JOIEnergy API");
+            });
+
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
         }
 
         private Dictionary<string, List<ElectricityReading>> GenerateMeterElectricityReadings() {
