@@ -8,11 +8,11 @@ using JOIEnergy.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace JOIEnergy
 {
@@ -24,6 +24,40 @@ namespace JOIEnergy
         }
 
         public IConfiguration Configuration { get; }
+
+        public Dictionary<String, Supplier> SmartMeterToPricePlanAccounts
+        {
+            get
+            {
+                Dictionary<String, Supplier> smartMeterToPricePlanAccounts = new Dictionary<string, Supplier>();
+                smartMeterToPricePlanAccounts.Add("smart-meter-0", Supplier.DrEvilsDarkEnergy);
+                smartMeterToPricePlanAccounts.Add("smart-meter-1", Supplier.TheGreenEco);
+                smartMeterToPricePlanAccounts.Add("smart-meter-2", Supplier.DrEvilsDarkEnergy);
+                smartMeterToPricePlanAccounts.Add("smart-meter-3", Supplier.PowerForEveryone);
+                smartMeterToPricePlanAccounts.Add("smart-meter-4", Supplier.TheGreenEco);
+                return smartMeterToPricePlanAccounts;
+            }
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseMvc();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "JOIEnergy API");
+            });
+
+            app.UseCors("MyPolicy");
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -49,7 +83,13 @@ namespace JOIEnergy
                 }
             };
 
-            services.AddCors();
+
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.WithOrigins("https://localhost:8080")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            }));
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IMeterReadingService, MeterReadingService>();
@@ -60,32 +100,8 @@ namespace JOIEnergy
             services.AddSwaggerGen();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        private Dictionary<string, List<ElectricityReading>> GenerateMeterElectricityReadings()
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseMvc();
-
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "JOIEnergy API");
-            });
-
-            // global cors policy
-            app.UseCors(x => x
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .SetIsOriginAllowed(origin => true) // allow any origin
-                .AllowCredentials()); // allow credentials
-        }
-
-        private Dictionary<string, List<ElectricityReading>> GenerateMeterElectricityReadings() {
             var readings = new Dictionary<string, List<ElectricityReading>>();
             var generator = new ElectricityReadingGenerator();
             var smartMeterIds = SmartMeterToPricePlanAccounts.Select(mtpp => mtpp.Key);
@@ -95,20 +111,6 @@ namespace JOIEnergy
                 readings.Add(smartMeterId, generator.Generate(20));
             }
             return readings;
-        }
-
-        public Dictionary<String, Supplier> SmartMeterToPricePlanAccounts
-        {
-            get
-            {
-                Dictionary<String, Supplier> smartMeterToPricePlanAccounts = new Dictionary<string, Supplier>();
-                smartMeterToPricePlanAccounts.Add("smart-meter-0", Supplier.DrEvilsDarkEnergy);
-                smartMeterToPricePlanAccounts.Add("smart-meter-1", Supplier.TheGreenEco);
-                smartMeterToPricePlanAccounts.Add("smart-meter-2", Supplier.DrEvilsDarkEnergy);
-                smartMeterToPricePlanAccounts.Add("smart-meter-3", Supplier.PowerForEveryone);
-                smartMeterToPricePlanAccounts.Add("smart-meter-4", Supplier.TheGreenEco);
-                return smartMeterToPricePlanAccounts;
-            }
         }
     }
 }
