@@ -18,6 +18,8 @@ namespace JOIEnergy
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -56,12 +58,21 @@ namespace JOIEnergy
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "JOIEnergy API");
             });
 
-            app.UseCors("MyPolicy");
+            app.UseCors(MyAllowSpecificOrigins);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                policy =>
+                                {
+                                    policy.WithOrigins("http://localhost:8080").AllowAnyHeader().AllowAnyMethod();
+                                });
+            });
+
             var readings =
                 GenerateMeterElectricityReadings();
 
@@ -83,13 +94,6 @@ namespace JOIEnergy
                 }
             };
 
-
-            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
-            {
-                builder.WithOrigins("https://localhost:8080")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
-            }));
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IMeterReadingService, MeterReadingService>();

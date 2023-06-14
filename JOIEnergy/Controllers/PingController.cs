@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 public class PingController: Controller
 {
-    [EnableCors("MyPolicy")]
+    [EnableCors("_myAllowSpecificOrigins")]
     [HttpPost("ping")]
     public ObjectResult Ping([FromBody] string message)
     {
