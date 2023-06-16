@@ -16,9 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JOIEnergy\JOIEnergy.csproj" />
+    <ProjectReference Include="..\TW.Offboarding\TW.Offboarding.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="PricePlanServiceTest.cs" />
   </ItemGroup>
 </Project>

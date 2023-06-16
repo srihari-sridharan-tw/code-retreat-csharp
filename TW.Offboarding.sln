@@ -1,9 +1,9 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JOIEnergy", "JOIEnergy\JOIEnergy.csproj", "{BF722F65-2C35-4ADF-B669-C7841E4E54E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TW.Offboarding", "TW.Offboarding\TW.Offboarding.csproj", "{BF722F65-2C35-4ADF-B669-C7841E4E54E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JOIEnergy.Tests", "JOIEnergy.Tests\JOIEnergy.Tests.csproj", "{92951323-A02D-4FC7-A0E3-0C4F37BD7AB9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TW.Offboarding.Tests", "TW.Offboarding.Tests\TW.Offboarding.Tests.csproj", "{92951323-A02D-4FC7-A0E3-0C4F37BD7AB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
